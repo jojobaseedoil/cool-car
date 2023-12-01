@@ -1,9 +1,9 @@
 #include "camera.h"
 
 Camera::Camera(InterfaceScene *owner, const glm::vec3&eye, const glm::vec3&center, const glm::vec3&up):
+	Actor(owner),
     mUp(up),
 	mEye(eye),
-	mOwner(owner),
     mCenter(center),
     mViewMatrix(glm::mat4(1.0))
 {
@@ -37,10 +37,10 @@ void Camera::LookAt(const glm::vec3&eye, const glm::vec3&center, const glm::vec3
 	mViewMatrix[3][2] = -glm::dot(f, eye);
 }
     
-void Camera::ProcessInput(GLFWwindow *window){
+void Camera::OnProcessInput(GLFWwindow *window){
 	/* Process Camera Input here... */
 }
 
-void Camera::Update(float DeltaTime){
+void Camera::OnUpdate(float DeltaTime){
     /* Update Camera here... */
 }

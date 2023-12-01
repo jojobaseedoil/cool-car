@@ -10,13 +10,19 @@ add_executable(
 	MyCar
 
     # ENGINE SPECIFICS
-    source/engine/DrawableObject.cpp
     source/engine/ConcreteScene.cpp
     source/engine/shader.cpp
-    source/engine/camera.cpp
+    source/engine/actors/camera.cpp
+    source/engine/actors/actor.cpp
+    source/engine/components/component.cpp
+    source/engine/components/drawables/DrawComponent.cpp
+    source/engine/components/RigidBodyComponent.cpp
     
     # ADD SCENES SPECIFICS HERE  
     source/scenes/CarScene.cpp
+    source/engine/actors/wheel.cpp
+    source/engine/actors/chassis.cpp
+    source/engine/actors/car.cpp
 
     # MAIN FILE
     source/main.cpp

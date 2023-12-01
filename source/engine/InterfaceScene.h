@@ -2,6 +2,9 @@
 
 #include "shader.h"
 
+class Actor;
+class DrawComponent;
+
 class InterfaceScene{
 public:
     virtual ~InterfaceScene() = default;
@@ -17,6 +20,12 @@ public:
     virtual void SetOrtho(float left, float right, float bottom, float top, float zNear, float zFar) = 0;
     virtual void SetPerspective(float fovy, float aspect, float zNear, float zFar) = 0;
     virtual void SetWireFrame(bool mode) = 0;
+    
+    virtual void AddActor(Actor *actor) = 0;
+    virtual void RemoveActor(Actor *actor) = 0;
+
+    virtual void AddDrawable(DrawComponent *drawable) = 0;
+    virtual void RemoveDrawable(DrawComponent *drawable) = 0;
 
 private:
     virtual void ProcessInput() = 0;

@@ -1,10 +1,12 @@
 #pragma once
 
-#include "camera.h"
-#include "DrawableObject.h"
+#include "InterfaceScene.h"
 
 #define INITIALIZE_FAILURE 0
 #define INITIALIZE_SUCCESS 1
+
+class Camera;
+class Actor;
 
 class ConcreteScene : public InterfaceScene{
 public:
@@ -25,9 +27,7 @@ public:
     inline const glm::mat4 &GetProjection() const override{
         return mProjectionMatrix;
     }
-    inline const glm::mat4 &GetView() const override{
-        return mCamera->mViewMatrix;
-    }
+    const glm::mat4 &GetView() const override;
     /* Setters */
     void SetOrtho(float left, float right, float bottom, float top, float zNear, float zFar) override;
     void SetPerspective(float fovy, float aspect, float zNear, float zFar) override;
@@ -35,6 +35,12 @@ public:
 
     /* Scene specific */
     virtual void CreateScene();
+
+    void AddActor(Actor *actor) override;
+    void RemoveActor(Actor *actor) override;
+
+    void AddDrawable(DrawComponent *drawable) override;
+    void RemoveDrawable(DrawComponent *drawable) override;
 
 private:
 	/* Private Methods */
@@ -51,7 +57,8 @@ protected:
     Shader mProgram;
     Camera *mCamera;
     glm::mat4 mProjectionMatrix;
-    std::vector<DrawableObject*> mDrawables;
+    std::vector<Actor*> mActors;
+    std::vector<DrawComponent*> mDrawables;
     
     float mLastFrame;
 };

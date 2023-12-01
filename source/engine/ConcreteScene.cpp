@@ -1,4 +1,7 @@
 #include "ConcreteScene.h"
+#include "actors/camera.h"
+#include "components/drawables/DrawComponent.h"
+#include <algorithm>
 
 /* Constructors and destructor */
 ConcreteScene::ConcreteScene(GLint WindowWidth, GLint WindowHeight):
@@ -55,8 +58,8 @@ bool ConcreteScene::StartScene(){
 }
 
 void ConcreteScene::EndScene(){
-    for(auto drawable : mDrawables)
-        delete drawable;
+    // for(auto drawable : mDrawables)
+    //     delete drawable;
     delete mCamera;  
     glfwDestroyWindow(mWindow);
     glDeleteProgram(mProgram.id);
@@ -93,8 +96,12 @@ void ConcreteScene::SetPerspective(float fovy, float aspect, float zNear, float 
 }
 
 void ConcreteScene::SetWireFrame(bool mode){
-    for(auto drawable : mDrawables)
-        drawable->SetWireFrame(mode);
+    // for(auto drawable : mDrawables)
+        // drawable->SetWireFrame(mode);
+}
+
+const glm::mat4 &ConcreteScene::GetView() const{
+        return mCamera->mViewMatrix;
 }
 
 /* Scene specific */
@@ -102,23 +109,48 @@ void ConcreteScene::CreateScene(){
     /* create your scene here... */
 }
 
+void ConcreteScene::AddActor(Actor *actor){
+    mActors.emplace_back(actor);
+}
+
+void ConcreteScene::RemoveActor(Actor *actor){
+    auto it = std::find(mActors.begin(), mActors.end(), actor);
+    if(it != mActors.end()){
+        std::iter_swap(it, mActors.end() -1);
+        mActors.pop_back();
+    }
+}
+
 /* Private Methods */
 void ConcreteScene::ProcessInput(){
     if(glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(mWindow, true);
 
-    for(DrawableObject *drawable : mDrawables){
-        drawable->ProcessInput(mWindow);
+    for(auto actor : mActors){
+        actor->ProcessInput(mWindow);
     }
     if(mCamera != nullptr)
         mCamera->ProcessInput(mWindow);
 }
 
+void ConcreteScene::AddDrawable(DrawComponent *drawable){
+    mDrawables.emplace_back(drawable);
+}
+
+void ConcreteScene::RemoveDrawable(DrawComponent *drawable){
+    auto it = std::find(mDrawables.begin(), mDrawables.end(), drawable);
+    if(it != mDrawables.end()){
+        std::iter_swap(it, mDrawables.end() -1);
+        mDrawables.pop_back();
+    }
+}
+
+
 void ConcreteScene::RenderScene(){
     glClearColor(0x00, 0x00, 0x00, 0xFF);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    for(DrawableObject *drawable : mDrawables){
+    for(auto drawable : mDrawables){
         drawable->Draw();
     }
 }
@@ -131,8 +163,8 @@ void ConcreteScene::UpdateScene(){
 
     // std::cout << "delta time: " << DeltaTime << "\n";
 
-    for(DrawableObject *drawable : mDrawables){
-        drawable->Update(DeltaTime);
+    for(auto actor : mActors){
+        actor->Update(DeltaTime);
     }
     if(mCamera != nullptr)
         mCamera->Update(DeltaTime);

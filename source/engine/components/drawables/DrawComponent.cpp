@@ -1,12 +1,12 @@
-#include "DrawableObject.h"
+#include "DrawComponent.h"
+#include "../../actors/actor.h"
 
-DrawableObject::DrawableObject(InterfaceScene *owner, GLfloat vertices[], GLuint indexes[], GLint nVertices, GLint nIndexes, GLint DrawOrder):
-    mOwner(owner),
+DrawComponent::DrawComponent(Actor *owner, GLfloat vertices[], GLuint indexes[], GLint nVertices, GLint nIndexes, GLint DrawOrder):
+    Component(owner),
     mMode(GL_TRIANGLES),
     mDrawOrder(DrawOrder),
     mNumberOfIndexes(nIndexes),
-    mNumberOfVertices(nVertices),
-    mModelMatrix(glm::mat4(1.0))
+    mNumberOfVertices(nVertices)
 {
     mVertices = new GLfloat[mNumberOfVertices*3];
     mIndexes = new GLuint[mNumberOfIndexes];
@@ -16,9 +16,10 @@ DrawableObject::DrawableObject(InterfaceScene *owner, GLfloat vertices[], GLuint
         mIndexes[i] = indexes[i];
 
     /* Set standard color */
+    auto scene = mOwner->GetScene();
+    scene->AddDrawable(this);
     SetColor(GREEN + RED);
-
-    Shader program = mOwner->GetProgram();
+    Shader program = scene->GetProgram();
 
     /* Create buffers to store the vertices */
     glGenVertexArrays(1, &mVAO);
@@ -41,23 +42,24 @@ DrawableObject::DrawableObject(InterfaceScene *owner, GLfloat vertices[], GLuint
     glEnableVertexAttribArray(Location::POSITION);
 }
 
-DrawableObject::DrawableObject(InterfaceScene *owner, const std::string filename):
-    mOwner(owner)
+DrawComponent::DrawComponent(Actor *owner, const std::string filename):
+    Component(owner)
 {
+    
     CreateDrawable();
     this->LoadDrawable(filename);
 }
 
-DrawableObject::DrawableObject(const DrawableObject &other){
+DrawComponent::DrawComponent(const DrawComponent &other){
     CreateDrawable();
-    *this = other; 
+    *this = other;
 }
 
-DrawableObject::DrawableObject(){
+DrawComponent::DrawComponent(){
     CreateDrawable();
 }
 
-DrawableObject &DrawableObject::operator=(const DrawableObject &other){
+DrawComponent &DrawComponent::operator=(const DrawComponent &other){
     /* self copy */
     if(this == &other){
         return *this;
@@ -87,8 +89,6 @@ DrawableObject &DrawableObject::operator=(const DrawableObject &other){
         mVertices[i] = other.mVertices[i];
     }
 
-    mModelMatrix = other.mModelMatrix;
-
     mVBO = other.mVBO;
     mVAO = other.mVAO;
     mEBO = other.mEBO;
@@ -96,63 +96,52 @@ DrawableObject &DrawableObject::operator=(const DrawableObject &other){
     return *this;
 }
 
-void DrawableObject::CreateDrawable(){
+void DrawComponent::CreateDrawable(){
     mIndexes = nullptr;
     mVertices = nullptr;
 }
 
-void DrawableObject::DestroyDrawable(){
+void DrawComponent::DestroyDrawable(){
     delete[] mIndexes;
     delete[] mVertices;
 }
 
-DrawableObject::~DrawableObject(){
+DrawComponent::~DrawComponent(){
     DestroyDrawable();
     glDeleteVertexArrays(1, &mVAO);
     glDeleteBuffers(1, &mVBO);
     glDeleteBuffers(1, &mEBO);
 }
 
-
-void DrawableObject::Update(float DeltaTime){
-    Shader program = mOwner->GetProgram();
+void DrawComponent::Draw(){
+    
+    InterfaceScene *scene = mOwner->GetScene();
+    Shader program = scene->GetProgram();
 
     /* Set up Matrices */
     program.SetColor("Color", mColor);
-    program.SetModel("Model", mModelMatrix);
-    program.SetView("View", mOwner->GetView());
-    program.SetProjection("Projection", mOwner->GetProjection());
-}
-void DrawableObject::ProcessInput(GLFWwindow *window){
-    /* Process your drawable object input here... */
-}
-
-void DrawableObject::Draw(){
-    
-    Shader program = mOwner->GetProgram();
+    program.SetModel("Model", mOwner->GetModel());
+    program.SetView("View", scene->GetView());
+    program.SetProjection("Projection", scene->GetProjection());
 
     /* Actually drawing */
     program.use();
     glBindVertexArray(mVAO);
     glDrawElements(mMode, mNumberOfIndexes, GL_UNSIGNED_INT, 0);
-    glBindVertexArray(program.GetLocation("Position"));    
+    glBindVertexArray(Location::POSITION);    
 }
 
-void DrawableObject::SetColor(const glm::vec3&color){
+void DrawComponent::SetColor(const glm::vec3&color){
     mColor[0] = (GLfloat)color[0];
     mColor[1] = (GLfloat)color[1];
     mColor[2] = (GLfloat)color[2];
 }
 
-void DrawableObject::SetModel(const glm::mat4&model){
-    mModelMatrix = model;
-}
-
-void DrawableObject::SetDrawMode(const GLenum mode){
+void DrawComponent::SetDrawMode(const GLenum mode){
     mMode = mode;
 }
 
-void DrawableObject::SetWireFrame(bool WireFrameMode){
+void DrawComponent::SetWireFrame(bool WireFrameMode){
     if(WireFrameMode){
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
     } else{
@@ -160,27 +149,23 @@ void DrawableObject::SetWireFrame(bool WireFrameMode){
     }
 }
 
-const GLfloat *DrawableObject::GetColor() const{
+const GLfloat *DrawComponent::GetColor() const{
     return mColor;
 }
 
-const glm::mat4 &DrawableObject::GetModel() const{
-    return mModelMatrix;
-}
-
-const GLenum DrawableObject::GetDrawMode() const{
+const GLenum DrawComponent::GetDrawMode() const{
     return mMode;
 }
 
-const GLint DrawableObject::GetDrawOrder() const{
+const GLint DrawComponent::GetDrawOrder() const{
     return mDrawOrder;
 }
 
-void DrawableObject::LoadDrawable(const std::string &filename){
+void DrawComponent::LoadDrawable(const std::string &filename){
     
     std::filebuf fb;
     if(!fb.open(filename, std::ios::in)){
-        std::cerr << "In void DrawableObject::LoadDrawable(const std::string &filename)\n";
+        std::cerr << "In void DrawComponent::LoadDrawable(const std::string &filename)\n";
         std::cerr << "Could not open file " << filename << "\n";
         exit(EXIT_FAILURE);
     }
@@ -223,7 +208,7 @@ void DrawableObject::LoadDrawable(const std::string &filename){
     fb.close();
 
     /* LOAD DATA INTO 'this' OBJECT */
-    DrawableObject *drawable = new DrawableObject(
+    DrawComponent *drawable = new DrawComponent(
         mOwner, vertices.data(), indexes.data(), 
         vertices.size()/3, indexes.size(), 0
     );
