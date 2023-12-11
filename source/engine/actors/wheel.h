@@ -6,15 +6,15 @@
 class Car;
 
 class Wheel : public Actor{
-    friend class Car;
 public:
     Wheel(InterfaceScene *scene, bool enabled);
 
     void OnUpdate(float DeltaTime) override;    
     void OnProcessInput(GLFWwindow *window) override;
+    bool IsFrontWheel() const;
 
 private:
-    bool mIsWheelEnabled;
+    bool mIsFrontWheel;
     DrawComponent *mDrawComponent;
     RigidBodyComponent *mRigidBodyComponent;
 };

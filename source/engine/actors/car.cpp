@@ -1,73 +1,95 @@
 #include "car.h"
-#include "chassis.h"
+#include "camera.h"
 #include "wheel.h"
+#include "../components/RigidBodyComponent.h"
+#include "../components/drawables/DrawComponent.h"
 
-#define CAR_FORWARD_SPEED 10.0f
-#define ROTATION_OFFSET 0.01f
+#define CAR_FORWARD_SPEED 75.0f
+#define CAR_WIDTH 4.0f
+#define CAR_HEIGHT 4.0f
+
+#define FRONT_WHEEL_ROTATION_RATE 1.25f
+#define FRONT_WHEEL_MAX_ANGLE 45.0f
 
 Car::Car(InterfaceScene *scene):
     Actor(scene),
-    mSteeringAngle(0.0)
-{
-    // mChassis = new Chassis(scene);
-    // mChassis->SetModel(glm::rotate(glm::mat4(1), glm::radians(90.0f), glm::vec3(1,0,0)));
-    // mChassis->SetModel(glm::translate(mChassis->GetModel(), glm::vec3(1,2,-2)));
-    float xOffset = 2.0f;
-    float yOffset = 5.0f;
-    for(int i=0; i<2; i++){
-        for(int j=0; j<2; j++){
-            Wheel *w = new Wheel(scene, i*true);
-            mWheels.emplace_back(w);
-            w->SetPosition( glm::vec3( j*xOffset, i*yOffset, 0 ) );
-        }
+    mCarWidth(CAR_WIDTH),
+    mCarHeight(CAR_HEIGHT),
+    mCameraDelay(0.0f)
+{   
+    new DrawComponent(this, "../models/chassis.obj");
+    new RigidBodyComponent(this, 1, 4);
+
+
+    for(int i=0; i<100; i++){
+        Wheel *w = new Wheel(scene, false);
+        w->SetPosition(glm::vec3(0,10*i,0));
     }
-    // mPivo = glm::vec3(0,0,0);
 }
 
 void Car::OnUpdate(float DeltaTime){
-    // for(int i=0; i<4; i++){
-    //     std::cout << mWheels[i]->GetRotation() << " ";
-    // } std::cout << "\n";
-    // mPivo = 
+    
+    glm::mat4 TranslateMatrix = glm::translate(glm::mat4(1), mPosition);
+    glm::mat4 RotationMatrix  = glm::rotate(TranslateMatrix,glm::radians(mRotation),glm::vec3(0,0,1));
+    RotationMatrix = glm::rotate(RotationMatrix, glm::radians(-90.0f), glm::vec3(1,0,0));
+    RotationMatrix = glm::rotate(RotationMatrix, glm::radians(-180.0f), glm::vec3(0,0,1));
+    SetModel(RotationMatrix);
 
-    // auto p1 = mWheels[0]->GetPosition();
-    // auto p2 = mWheels[2]->GetPosition();
-    // auto p3 = mWheels[1]->GetPosition();
-    // auto u = p3 - p1;
-    // auto v = p2 - p1;
-
-    // std::cout << mWheels[0]->GetPosition().y << " " << v.length()/2 << "\n";
-
-    // mPivo = glm::vec3(p3.x - u.length()/2, p2.y - v.length()/2, 0);
-
-    // mChassis->SetPosition(mPivo);
+    std::cout << GetPosition().x << " ";
+    std::cout << GetPosition().y << " ";
+    std::cout << GetPosition().z << "\n\n";
 }
 
 void Car::OnProcessInput(GLFWwindow *window){
 
     if( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ){
-
-        for(auto wheel : mWheels){
-            auto rb = wheel->GetComponent<RigidBodyComponent>();
-            rb->ApplyForce(glm::vec3(0,1,0) * CAR_FORWARD_SPEED);
-        }
-
-    }
-
-    if( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ){
-        mSteeringAngle += ROTATION_OFFSET;
+        Move(glm::vec3(0,1,0), CAR_FORWARD_SPEED);
+        SetRotation(0);
     } 
-
-
-    if( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS ){
-        for(auto wheel : mWheels){
-            auto rb = wheel->GetComponent<RigidBodyComponent>();
-            rb->ApplyForce(glm::vec3(0,1,0) * -CAR_FORWARD_SPEED);
-        }
-    } 
-
 
     if( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS ){
-        mSteeringAngle -= ROTATION_OFFSET;
+        Move(glm::vec3(1,0,0), CAR_FORWARD_SPEED);
+        SetRotation(-90);
+    }
+
+    if( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS ){
+        Move(glm::vec3(0,-1,0), CAR_FORWARD_SPEED);
+        SetRotation(180);
     } 
+
+    if( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ){
+        Move(glm::vec3(-1,0,0), CAR_FORWARD_SPEED);
+        SetRotation(90);
+    }
+
+    if( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS ){
+        Move(glm::vec3(1,1,0), CAR_FORWARD_SPEED/4);
+        SetRotation(-45);
+    }
+
+    if( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ){
+        Move(glm::vec3(-1,1,0), CAR_FORWARD_SPEED/4);
+        SetRotation(45);
+    }  
+
+    if( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS ){
+        Move(glm::vec3(1,-1,0), CAR_FORWARD_SPEED/4);
+        SetRotation(-135);
+    }  
+
+    if( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ){
+        Move(glm::vec3(-1,-1,0), CAR_FORWARD_SPEED/4);
+        SetRotation(135);
+    }  
+}
+
+void Car::Move(const glm::vec3 &dir, const float speed){
+    
+    this->GetComponent<RigidBodyComponent>()->ApplyForce(dir*speed);
+    
+    glm::vec3 CarPos = GetPosition();
+    Camera *camera = mScene->GetCamera();
+    // camera->SetPosition(CarPos);
+
+    camera->GetComponent<RigidBodyComponent>()->ApplyForce(dir*(speed/4));
 }

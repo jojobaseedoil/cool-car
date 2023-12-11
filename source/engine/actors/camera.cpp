@@ -1,4 +1,5 @@
 #include "camera.h"
+#include "../components/RigidBodyComponent.h"
 
 Camera::Camera(InterfaceScene *owner, const glm::vec3&eye, const glm::vec3&center, const glm::vec3&up):
 	Actor(owner),
@@ -8,6 +9,7 @@ Camera::Camera(InterfaceScene *owner, const glm::vec3&eye, const glm::vec3&cente
     mViewMatrix(glm::mat4(1.0))
 {
 	LookAt(eye,center,up);
+	new RigidBodyComponent(this, 1, 1);
 }
 
 Camera::~Camera(){
@@ -15,26 +17,7 @@ Camera::~Camera(){
 }
 
 void Camera::LookAt(const glm::vec3&eye, const glm::vec3&center, const glm::vec3&up){
-    const glm::vec3 f(glm::normalize(eye - center));
-	const glm::vec3 s(glm::normalize(glm::cross(up, f)));
-	const glm::vec3 u(glm::cross(f, s));
-	
-	mViewMatrix = glm::mat4(1.0);
-	mViewMatrix[0][0] = s.x;
-	mViewMatrix[1][0] = s.y;
-	mViewMatrix[2][0] = s.z;
-	
-	mViewMatrix[0][1] = u.x;
-	mViewMatrix[1][1] = u.y;
-	mViewMatrix[2][1] = u.z;
-
-	mViewMatrix[0][2] = f.x;
-	mViewMatrix[1][2] = f.y;
-	mViewMatrix[2][2] = f.z;
-
-	mViewMatrix[3][0] = -glm::dot(s, eye);
-	mViewMatrix[3][1] = -glm::dot(u, eye);
-	mViewMatrix[3][2] = -glm::dot(f, eye);
+	mViewMatrix = glm::lookAt(eye,center,up);
 }
     
 void Camera::OnProcessInput(GLFWwindow *window){
@@ -43,4 +26,16 @@ void Camera::OnProcessInput(GLFWwindow *window){
 
 void Camera::OnUpdate(float DeltaTime){
     /* Update Camera here... */
+    const glm::vec3 eye(mPosition.x,mPosition.y-15,10);
+    const glm::vec3 center(mPosition.x, mPosition.y,0);
+    const glm::vec3 up(0,1,0);
+    this->LookAt(eye, center, up);
+}
+
+const glm::mat4 &Camera::GetView() const{
+	return mViewMatrix;
+}
+
+void Camera::SetView(const glm::mat4 &view){
+	mViewMatrix = view;
 }

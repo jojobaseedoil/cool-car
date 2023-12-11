@@ -101,7 +101,11 @@ void ConcreteScene::SetWireFrame(bool mode){
 }
 
 const glm::mat4 &ConcreteScene::GetView() const{
-        return mCamera->mViewMatrix;
+    return mCamera->GetView();
+}
+
+Camera *ConcreteScene::GetCamera() const{
+    return mCamera;
 }
 
 /* Scene specific */

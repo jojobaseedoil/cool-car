@@ -28,6 +28,8 @@ public:
         return mProjectionMatrix;
     }
     const glm::mat4 &GetView() const override;
+    Camera *GetCamera() const override;
+    
     /* Setters */
     void SetOrtho(float left, float right, float bottom, float top, float zNear, float zFar) override;
     void SetPerspective(float fovy, float aspect, float zNear, float zFar) override;

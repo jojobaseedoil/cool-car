@@ -4,6 +4,7 @@
 
 class Wheel;
 class Chassis;
+class RigidBodyComponent;
 
 class Car : public Actor{
 public:
@@ -12,9 +13,8 @@ public:
     void OnUpdate(float DeltaTime) override;
     void OnProcessInput(GLFWwindow *window) override;
 
+    void Move(const glm::vec3 &dir, const float speed);
 private:
-    Chassis *mChassis;
-    std::vector<Wheel*> mWheels;
-    glm::vec3 mPivo;
-    float mSteeringAngle;
+    float mCarWidth, mCarHeight;
+    float mCameraDelay;
 };

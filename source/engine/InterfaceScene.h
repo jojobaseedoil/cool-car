@@ -3,6 +3,7 @@
 #include "shader.h"
 
 class Actor;
+class Camera;
 class DrawComponent;
 
 class InterfaceScene{
@@ -16,6 +17,8 @@ public:
     virtual const Shader &GetProgram() const = 0;       /* get shader program */
     virtual const glm::mat4 &GetProjection() const = 0; /* get projection matrix */
     virtual const glm::mat4 &GetView() const = 0;       /* get view matrix */
+    virtual Camera *GetCamera() const = 0;
+
     /* setters */
     virtual void SetOrtho(float left, float right, float bottom, float top, float zNear, float zFar) = 0;
     virtual void SetPerspective(float fovy, float aspect, float zNear, float zFar) = 0;

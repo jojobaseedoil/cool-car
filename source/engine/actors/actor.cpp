@@ -59,3 +59,35 @@ void Actor::AddComponent(Component* c){
         return a->GetUpdateOrder() < b->GetUpdateOrder();
     });
 }
+
+const glm::vec3 &Actor::GetPosition() const{
+    return mPosition;
+}
+
+void Actor::SetPosition(const glm::vec3 &pos){
+    mPosition = pos;
+}
+
+float Actor::GetRotation() const{
+    return mRotation;
+}
+
+void Actor::SetRotation(float rot){
+    mRotation = rot;
+}
+
+glm::vec3 Actor::GetForward() const { 
+    return glm::vec3(glm::cos(mRotation), -glm::sin(mRotation), 0); 
+}
+
+const glm::mat4 &Actor::GetModel() const{ 
+    return mModelMatrix; 
+}
+
+void Actor::SetModel(const glm::mat4 &model){ 
+    mModelMatrix = model; 
+}
+
+InterfaceScene *Actor::GetScene() const { 
+    return mScene; 
+}
