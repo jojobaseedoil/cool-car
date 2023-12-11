@@ -17,7 +17,7 @@ Car::Car(InterfaceScene *scene):
     mCarHeight(CAR_HEIGHT),
     mCameraDelay(0.0f)
 {   
-    new DrawComponent(this, "../models/chassis.obj");
+    new DrawComponent(this, "../models/cool-car.obj");
     new RigidBodyComponent(this, 1, 4);
 
 
@@ -89,7 +89,5 @@ void Car::Move(const glm::vec3 &dir, const float speed){
     
     glm::vec3 CarPos = GetPosition();
     Camera *camera = mScene->GetCamera();
-    // camera->SetPosition(CarPos);
-
     camera->GetComponent<RigidBodyComponent>()->ApplyForce(dir*(speed/4));
 }
