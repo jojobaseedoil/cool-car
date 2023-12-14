@@ -25,7 +25,7 @@ void CarScene::CreateScene(){
     SetPerspective(90.0f, (float)(mWindowWidth)/mWindowHeight, 0.1f, 5000.0f);
     
     Light *light = new Light(this);
-    light->SetPosition(glm::vec3(0,0,5));
+    light->SetPosition(glm::vec3(0,0,0.25)); /* muda a posição da luz aqiu */
 
     const Vertex vertices[] = {
         /* position */                  /* color */                     /* texcoord */              /* normal */
