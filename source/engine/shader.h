@@ -23,7 +23,8 @@ enum Location : GLuint{
 	COLOR,
 	PROJECTION,
 	MODEL,
-	VIEW
+	VIEW,
+    TEXCOORD
 };
 
 class Shader{
@@ -31,33 +32,17 @@ public:
     /* build and read shaders */
     Shader() = default;
     Shader(const char *VertexShaderPath, const char *FragmentShaderPath);
+    
     /* Program id */
     GLuint id;
+
     /* Activate shader */
     inline void use(){ glUseProgram(id); }
+
     /* utility uniform functions */
-    inline GLint GetLocation(const std::string &name) const{
-        return glGetUniformLocation(id, name.c_str());
-    }
-    inline void SetBool(const std::string &name, bool value) const{
-        glUniform1i(glGetUniformLocation(id, name.c_str()), value);
-    }
-    inline void SetInt(const std::string &name, int value) const{
-        glUniform1i(glGetUniformLocation(id, name.c_str()), value);
-    }
-    inline void SetFloat(const std::string &name, float value) const{
-        glUniform1f(glGetUniformLocation(id, name.c_str()), value);
-    }
-    inline void SetColor(const std::string &name, GLfloat *color) const{
-        glUniform3fv(Location::COLOR, 1, color);
-    }
-    inline void SetProjection(const std::string &name, const glm::mat4 &projection) const{ /* set projection matrix */
-        glUniformMatrix4fv(Location::PROJECTION, 1, GL_FALSE, glm::value_ptr(projection));
-    }
-    inline void SetView(const std::string &name, const glm::mat4 &view) const{ /* set view matrix */
-        glUniformMatrix4fv(Location::VIEW, 1, GL_FALSE, glm::value_ptr(view));
-    }
-    inline void SetModel(const std::string &name, const glm::mat4 &model) const{ /* set model matrix */
-        glUniformMatrix4fv(Location::MODEL, 1, GL_FALSE, glm::value_ptr(model));
-    }
+    void SetBool(const std::string &name, const bool value) const;
+    void SetInt(const std::string &name, const int value) const;
+    void SetFloat(const std::string &name, const float value) const;
+    void SetMat4(const std::string &name, const glm::mat4 &value) const;
+    void SetVec3f(const std::string &name, const glm::vec3 &value) const;
 };

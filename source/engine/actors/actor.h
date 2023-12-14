@@ -6,6 +6,7 @@
 #define MAX_WHEEL_ROTATION 0.4f
 
 class Component;
+class Texture;
 
 enum class ActorState{
     Active,
@@ -22,12 +23,13 @@ public:
     void ProcessInput(GLFWwindow *window);
 
     const glm::vec3 &GetPosition() const;
-    void SetPosition(const glm::vec3 &pos);
+    void SetPosition(const glm::vec3 &position);
 
-    float GetRotation() const;
-    void SetRotation(float rot);
+    const glm::vec3 &GetRotation() const;
+    void SetRotation(const glm::vec3 &rotation);
 
-    glm::vec3 GetForward() const;
+    const glm::vec3 &GetScale() const;
+    void SetScale(const glm::vec3 &scale);
     
     const glm::mat4 &GetModel() const;
     void SetModel(const glm::mat4 &model);
@@ -44,6 +46,17 @@ public:
         return nullptr;
     }
 
+    std::vector<Texture*> GetTextures() const{
+        std::vector<Texture*> textures;
+        textures.push_back(mDiffuse);
+        textures.push_back(mSpecular);
+        return textures;
+    }
+    void SetTextures(Texture *diffuse, Texture *specular){
+        mDiffuse = diffuse;
+        mSpecular = specular;
+    }
+
 protected:
 
     virtual void OnProcessInput(GLFWwindow *window);
@@ -52,11 +65,16 @@ protected:
     InterfaceScene *mScene;
     
     glm::vec3 mPosition;
+    glm::vec3 mRotation;
+    glm::vec3 mScale;
+
     ActorState mState;
-    float mRotation;
 
     std::vector<Component*> mComponents;
     glm::mat4 mModelMatrix;
+
+    Texture *mDiffuse;
+    Texture *mSpecular;
 
 private:
     friend class Component;

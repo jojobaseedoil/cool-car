@@ -9,9 +9,11 @@ Wheel::Wheel(InterfaceScene *scene, bool enabled):
 }
 
 void Wheel::OnUpdate(float DeltaTime){
-    glm::mat4 tMatrix = glm::translate(glm::mat4(1),mPosition);
-    glm::mat4 model = glm::rotate(tMatrix,glm::radians(mRotation),glm::vec3(0,0,1));
-    SetModel(model);
+    mModelMatrix = glm::mat4(1.f);
+    mModelMatrix = glm::translate(mModelMatrix, mPosition);
+    mModelMatrix = glm::rotate(mModelMatrix, glm::radians(mRotation.x), glm::vec3(1.f,0.f,0.f));
+    mModelMatrix = glm::rotate(mModelMatrix, glm::radians(mRotation.y), glm::vec3(0.f,1.f,0.f));
+    mModelMatrix = glm::rotate(mModelMatrix, glm::radians(mRotation.z), glm::vec3(0.f,0.f,1.f));
 }
 
 void Wheel::OnProcessInput(GLFWwindow *window){

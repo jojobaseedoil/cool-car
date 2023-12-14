@@ -61,6 +61,6 @@ protected:
     glm::mat4 mProjectionMatrix;
     std::vector<Actor*> mActors;
     std::vector<DrawComponent*> mDrawables;
-    
+
     float mLastFrame;
 };

@@ -2,6 +2,7 @@
 
 #include "../engine/ConcreteScene.h"
 
+class Light;
 class Car;
 
 class CarScene : public ConcreteScene{
@@ -11,5 +12,6 @@ public:
     /* Scene specific */
     void CreateScene() override;
 private:
+    Light *mLight;
     Car *mCar;
 };

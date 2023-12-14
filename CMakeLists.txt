@@ -17,11 +17,14 @@ add_executable(
     source/engine/components/component.cpp
     source/engine/components/drawables/DrawComponent.cpp
     source/engine/components/RigidBodyComponent.cpp
-    
+    source/engine/components/texture.cpp
+    source/engine/components/material.cpp
+    source/engine/actors/light.cpp
+    source/engine/actors/StaticActor.cpp
+
     # ADD SCENES SPECIFICS HERE  
     source/scenes/CarScene.cpp
     source/engine/actors/wheel.cpp
-    source/engine/actors/chassis.cpp
     source/engine/actors/car.cpp
 
     # MAIN FILE

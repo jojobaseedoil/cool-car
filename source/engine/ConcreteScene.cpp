@@ -22,7 +22,8 @@ ConcreteScene::~ConcreteScene(){
 
 /* Scene main methods */
 bool ConcreteScene::StartScene(){
-/* Start GLFW for window management */
+    
+    /* Start GLFW for window management */
     if(!glfwInit()){
 		std::cerr << "Could not initializate GLFW.\n";
 		return INITIALIZE_FAILURE;
@@ -50,6 +51,11 @@ bool ConcreteScene::StartScene(){
 
     /* Create Shader program */
     mProgram = Shader(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CCW);
     
     /* Create your scene */
     CreateScene();
@@ -76,23 +82,11 @@ void ConcreteScene::MainLoop(){
 
 /* Setters */
 void ConcreteScene::SetOrtho(float left, float right, float bottom, float top, float zNear, float zFar){
-	mProjectionMatrix = glm::mat4(1.0);
-	mProjectionMatrix[0][0] = 2.0f / (right - left);
-	mProjectionMatrix[1][1] = 2.0f / (top - bottom);
-	mProjectionMatrix[2][2] = - 2.0f / (zFar - zNear);
-	mProjectionMatrix[3][0] = - (right + left) / (right - left);
-	mProjectionMatrix[3][1] = - (top + bottom) / (top - bottom);
-	mProjectionMatrix[3][2] = - (zFar + zNear) / (zFar - zNear);
+    mProjectionMatrix = glm::ortho(left,right,bottom,top,zNear,zFar);
 }
 
 void ConcreteScene::SetPerspective(float fovy, float aspect, float zNear, float zFar){
-	const float tanHalfFovy = glm::tan( fovy / 2.0f );
-	mProjectionMatrix = glm::mat4(0);
-	mProjectionMatrix[0][0] = 1.0f / (aspect * tanHalfFovy);
-	mProjectionMatrix[1][1] = 1.0f / (tanHalfFovy);
-	mProjectionMatrix[2][2] = - (zFar + zNear) / (zFar - zNear);
-	mProjectionMatrix[2][3] = - 1.0f;
-	mProjectionMatrix[3][2] = - (2.0f * zFar * zNear) / (zFar - zNear);
+    mProjectionMatrix = glm::perspective(fovy,aspect,zNear,zFar);
 }
 
 void ConcreteScene::SetWireFrame(bool mode){
@@ -164,8 +158,6 @@ void ConcreteScene::UpdateScene(){
     float CurrentFrame = glfwGetTime();
     float DeltaTime = CurrentFrame - mLastFrame;
     mLastFrame = CurrentFrame;
-
-    // std::cout << "delta time: " << DeltaTime << "\n";
 
     for(auto actor : mActors){
         actor->Update(DeltaTime);

@@ -3,6 +3,8 @@
 #include "wheel.h"
 #include "../components/RigidBodyComponent.h"
 #include "../components/drawables/DrawComponent.h"
+#include "../components/texture.h"
+#include "../components/material.h"
 
 #define CAR_FORWARD_SPEED 75.0f
 #define CAR_WIDTH 4.0f
@@ -19,8 +21,16 @@ Car::Car(InterfaceScene *scene):
     mCurrentGear(0),
     mCanProcessInput(false)
 {   
-    new DrawComponent(this, "../models/cool-car.obj");
-    new RigidBodyComponent(this, 1, 4);
+    // new DrawComponent(this, "../models/cool-car.obj");
+    // new RigidBodyComponent(this, 1, 4);
+    // new Texture(this, "../models/container.jpg", GL_TEXTURE_2D);
+    
+    // const glm::vec3 ambient(0.5f);
+    // const glm::vec3 diffuse(1.f);
+    // const glm::vec3 specular(1.f);
+    // const GLint diffuseTexture  = 0;
+    // const GLint specularTexture = 0;
+    // new Material(this, ambient, diffuse, specular, diffuseTexture, specularTexture);
 
     mGearBox[0] = NEUTRAL_GEAR_SPEED;
     mGearBox[1] = FIRST_GEAR_SPEED;
@@ -28,19 +38,21 @@ Car::Car(InterfaceScene *scene):
     mGearBox[3] = THIRD_GEAR_SPEED;
     mGearBox[4] = REVERSE_GEAR;
 
-    for(int i=0; i<100; i++){
-        Wheel *w = new Wheel(scene, false);
-        w->SetPosition(glm::vec3(0,10*i,0));
-    }
+    // for(int i=0; i<100; i++){
+    //     Wheel *w = new Wheel(scene, false);
+    //     w->SetPosition(glm::vec3(0,10*i,-10));
+    // }
 }
 
 void Car::OnUpdate(float DeltaTime){
     
-    glm::mat4 TranslateMatrix = glm::translate(glm::mat4(1), mPosition);
-    glm::mat4 RotationMatrix  = glm::rotate(TranslateMatrix,glm::radians(mRotation),glm::vec3(0,0,1));
-    RotationMatrix = glm::rotate(RotationMatrix, glm::radians(-90.0f), glm::vec3(1,0,0));
-    RotationMatrix = glm::rotate(RotationMatrix, glm::radians(-180.0f), glm::vec3(0,0,1));
-    SetModel(RotationMatrix);
+    mModelMatrix = glm::mat4(1.f);
+    mModelMatrix = glm::translate(mModelMatrix, mPosition);
+    mModelMatrix = glm::rotate(mModelMatrix, glm::radians(mRotation.x), glm::vec3(1.f,0.f,0.f));
+    mModelMatrix = glm::rotate(mModelMatrix, glm::radians(mRotation.y), glm::vec3(0.f,1.f,0.f));
+    mModelMatrix = glm::rotate(mModelMatrix, glm::radians(mRotation.z), glm::vec3(0.f,0.f,1.f));
+    mModelMatrix = glm::scale(mModelMatrix, mScale);
+    
 
     // std::cout << GetPosition().x << " ";
     // std::cout << GetPosition().y << " ";
@@ -69,52 +81,54 @@ void Car::OnProcessInput(GLFWwindow *window){
         mSpeed = mGearBox[mCurrentGear];
     }
 
+
     /* move up */
     if( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ){
         Move(glm::vec3(0,1,0)*mSpeed);
-        SetRotation(0);
+        SetRotation(glm::vec3(90, 0, 0));
     } 
 
     /* move to right */
     if( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS ){
         Move(glm::vec3(1,0,0)*mSpeed);
-        SetRotation(-90);
+        SetRotation(glm::vec3(0,90,90));
     }
 
     /* move to down */
     if( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS ){
         Move(glm::vec3(0,-1,0)*mSpeed);
-        SetRotation(180);
+        SetRotation(glm::vec3(90, 0, 0));
     } 
 
     /* move to left */
     if( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ){
         Move(glm::vec3(-1,0,0)*mSpeed);
-        SetRotation(90);
+        SetRotation(glm::vec3(0, -90, -90));
     }
     
     /* move up right */
     if( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS ){
         Move(glm::vec3(1,1,0)*mSpeed/4.0f);
-        SetRotation(-45);
+        // rotation.z = -45.0f;
+        SetRotation(glm::vec3(90, 135, 0));
     }
 
     /* move up left */
     if( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ){
         Move(glm::vec3(-1,1,0)*mSpeed/4.0f);
-        SetRotation(45);
+        SetRotation(glm::vec3(90, -135, 0));
     }  
 
     /* move down right */
     if( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS ){
         Move(glm::vec3(1,-1,0)*mSpeed/4.0f);
-        SetRotation(-135);
+        SetRotation(glm::vec3(90, 45, 0));
     }  
 
     /* move to down left */
     if( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ){
         Move(glm::vec3(-1,-1,0)*mSpeed/4.0f);
-        SetRotation(135);
+        SetRotation(glm::vec3(90, -45, 0));
     } 
 }
 

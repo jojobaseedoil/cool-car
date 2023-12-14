@@ -1,13 +1,17 @@
 #include "actor.h"
 #include "../components/component.h"
 #include <algorithm>
+#include "../components/texture.h"
 
 Actor::Actor(InterfaceScene *scene):
-    mPosition(glm::vec3(0,0,0)),
-    mRotation(0.0f),
+    mPosition(glm::vec3(0.f,0.f,0.f)),
+    mRotation(glm::vec3(0.f,0.f,0.f)),
+    mScale(glm::vec3(1.f,1.f,1.f)),
     mScene(scene),
     mState(ActorState::Active),
-    mModelMatrix(glm::mat4(1))
+    mModelMatrix(glm::mat4(1)),
+    mDiffuse(nullptr),
+    mSpecular(nullptr)
 {
     mScene->AddActor(this);
 }
@@ -64,20 +68,24 @@ const glm::vec3 &Actor::GetPosition() const{
     return mPosition;
 }
 
-void Actor::SetPosition(const glm::vec3 &pos){
-    mPosition = pos;
+void Actor::SetPosition(const glm::vec3 &position){
+    mPosition = position;
 }
 
-float Actor::GetRotation() const{
+const glm::vec3 &Actor::GetRotation() const{
     return mRotation;
 }
 
-void Actor::SetRotation(float rot){
-    mRotation = rot;
+void Actor::SetRotation(const glm::vec3 &rotation){
+    mRotation = rotation;
 }
 
-glm::vec3 Actor::GetForward() const { 
-    return glm::vec3(glm::cos(mRotation), -glm::sin(mRotation), 0); 
+const glm::vec3 &Actor::GetScale() const{
+    return mScale;
+}
+
+void Actor::SetScale(const glm::vec3 &scale){
+    mScale = scale;
 }
 
 const glm::mat4 &Actor::GetModel() const{ 
