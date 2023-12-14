@@ -26,14 +26,14 @@ void Camera::OnProcessInput(GLFWwindow *window){
 
 void Camera::OnUpdate(float DeltaTime){
     /* Update Camera here... */
-    // const glm::vec3 eye(mPosition.x,mPosition.y-20,1);
-    // const glm::vec3 center(mPosition.x, mPosition.y,0);
-    // const glm::vec3 up(0,1,0);
-    // this->LookAt(eye, center, up);
+    const glm::vec3 eye(mPosition.x,mPosition.y-20,15);
+    const glm::vec3 center(mPosition.x, mPosition.y,0);
+    const glm::vec3 up(0,1,0);
+    this->LookAt(eye, center, up);
 
-    // Shader program = mScene->GetProgram();
-    // program.use();
-    // program.SetVec3f("camera_position", mPosition);
+    Shader program = mScene->GetProgram();
+    program.use();
+    program.SetVec3f("camera_position", mPosition);
 }
 
 const glm::mat4 &Camera::GetView() const{

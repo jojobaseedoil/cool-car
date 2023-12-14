@@ -47,6 +47,6 @@ void main(){
     vec4 diffuse_final  = calc_diffuse(material, vs_position, vs_normal, light_position); 
     vec4 specular_final = calc_specular(material, vs_position, vs_normal, light_position, camera_position);
 
-    fs_color = texture(material.diffuse_texture, vs_texcoord) * (ambient_final + diffuse_final + specular_final);
+    fs_color = texture(material.diffuse_texture, vs_texcoord) * (ambient_final + diffuse_final + specular_final)* vec4(vs_color, 1.0f);
     // fs_color = (ambient_final + diffuse_final + specular_final) * vec4(vs_color, 1.0f);
 }

@@ -85,20 +85,20 @@ void Car::OnProcessInput(GLFWwindow *window){
     /* move up */
     if( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ){
         Move(glm::vec3(0,1,0)*mSpeed);
-        SetRotation(glm::vec3(90, 0, 0));
+        SetRotation(glm::vec3(-90, 0, 180));
     } 
-
-    /* move to right */
-    if( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS ){
-        Move(glm::vec3(1,0,0)*mSpeed);
-        SetRotation(glm::vec3(0,90,90));
-    }
 
     /* move to down */
     if( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS ){
         Move(glm::vec3(0,-1,0)*mSpeed);
         SetRotation(glm::vec3(90, 0, 0));
     } 
+    /* move to right */
+    if( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS ){
+        Move(glm::vec3(1,0,0)*mSpeed);
+        SetRotation(glm::vec3(0,90,90));
+    }
+
 
     /* move to left */
     if( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ){
